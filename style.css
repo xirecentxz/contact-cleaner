@@ -1,0 +1,102 @@
+:root {
+    --primary: #4f46e5;
+    --bg: #0f172a;
+    --card: #1e293b;
+    --text: #f8fafc;
+    --border: #334155;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
+    display: flex;
+    justify-content: center;
+    padding: 40px 20px;
+    margin: 0;
+}
+
+.container {
+    max-width: 600px;
+    width: 100%;
+    background: var(--card);
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    border: 1px solid var(--border);
+}
+
+h1 {
+    margin: 0;
+    font-size: 24px;
+    color: var(--primary);
+}
+
+p {
+    color: #94a3b8;
+    font-size: 14px;
+}
+
+.upload-section {
+    border: 2px dashed var(--primary);
+    padding: 40px 20px;
+    text-align: center;
+    border-radius: 8px;
+    margin: 25px 0;
+    transition: background 0.3s;
+    cursor: pointer;
+}
+
+.upload-section:hover {
+    background: rgba(79, 70, 229, 0.1);
+}
+
+#config-section {
+    background: #111827;
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 20px;
+}
+
+select, button {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: #1e293b;
+    color: white;
+}
+
+button {
+    background: var(--primary);
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    transition: opacity 0.2s;
+}
+
+button:hover {
+    opacity: 0.9;
+}
+
+.options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 15px 0;
+}
+
+.options label {
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Statistik Style */
+.stats-container {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+}
