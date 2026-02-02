@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Cleaner Pro</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Contact Cleaner Pro</h1>
+        <p>IT Support Automation Tool</p>
+        
+        <div class="upload-section">
+            <input type="file" id="upload-excel" accept=".xlsx, .xls">
+            <p>Tarik file Excel ke sini atau klik untuk upload</p>
+        </div>
+
+        <div id="config-section" style="display:none;">
+            <h3>Pengaturan Pembersihan</h3>
+            <label>Pilih Kolom Nomor Telepon:</label>
+            <select id="column-selector"></select>
+            
+            <div class="options">
+                <label><input type="checkbox" id="clean-home" checked> Hapus No. Rumah</label>
+                <label><input type="checkbox" id="clean-intl" checked> Hapus No. Luar Negeri</label>
+                <label><input type="checkbox" id="remove-dup" checked> Hapus Duplikat</label>
+            </div>
+            
+            <button id="process-btn">Proses & Download</button>
+        </div>
+
+        <div id="stats" class="stats-container"></div>
+    </div>
+
+    <script src="js/cleaner.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
