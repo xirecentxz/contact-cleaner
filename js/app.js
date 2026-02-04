@@ -1,23 +1,24 @@
 /**
  * CONTACT CLEANER PRO
- * Cukup ubah versi di sini untuk update seluruh sistem
+ * v3.6.3 - Ultra Deep Scan & Notation Fix
  */
-const APP_VERSION = "v3.6.1-Final";
+const APP_VERSION = "v3.6.3-UltraScan";
 
-// Tampilkan versi di layar & console otomatis
 document.addEventListener("DOMContentLoaded", () => {
     const tag = document.getElementById('version-tag');
     if (tag) tag.innerText = APP_VERSION;
-    console.log(`%c ${APP_VERSION} Loaded Successfully `, "background: #4f46e5; color: #fff; font-weight: bold;");
+    console.log(`%c ${APP_VERSION} Loaded - Detecting All Phone Values `, "background: #10b981; color: #fff; font-weight: bold; padding: 4px;");
 });
 
 const cleaner = {
     splitNumbers: function(rawString) {
         if (!rawString) return [];
+        // Support pemisah kompleks dari contacts.csv
         return String(rawString).split(/[/|:;]|\s{2,}|:::/).map(n => n.trim()).filter(n => n.length > 0);
     },
     formatForBlast: function(phone) {
-        let clean = String(phone).replace(/\D/g, '');
+        // Hapus semua karakter kecuali angka, tangani notasi ilmiah (E+)
+        let clean = String(phone).replace(/[^\d]/g, '');
         if (clean.startsWith('0')) clean = '62' + clean.slice(1);
         const isMobile = /^628[1-9][0-9]{7,11}$/.test(clean);
         const isHome = /^62[2-7,9][0-9]{7,9}$/.test(clean) && !clean.startsWith('628');
@@ -42,20 +43,39 @@ const toggleLoading = (show, text = "") => {
 };
 
 function detectPhoneColumns(data) {
+    if (!data || data.length === 0) return [];
     const allColumns = Object.keys(data[0]);
-    const keywords = ['phone', 'mobile', 'kontak', 'contact', 'telp', 'wa', 'value'];
+    
     return allColumns.map(col => {
+        const colLower = col.toLowerCase();
+        
+        // KRITERIA 1: Nama kolom mengandung 'Phone' dan 'Value'
+        const isExplicitPhoneValue = colLower.includes('phone') && colLower.includes('value');
+        
+        // KRITERIA 2: Mengandung keyword telepon umum
+        const phoneKeywords = ['mobile', 'telp', 'wa', 'msisdn', 'cell', 'kontak'];
+        const hasKeyword = phoneKeywords.some(k => colLower.includes(k));
+        
         let isNumeric = false, sample = "";
-        for (let i = 0; i < data.length; i++) { // FULL SCAN SEMUA BARIS
+        
+        // SCAN SEMUA BARIS untuk mencari pola angka atau notasi ilmiah
+        for (let i = 0; i < data.length; i++) {
             const val = String(data[i][col] || "").trim();
-            if (/\d{5,}/.test(val)) { isNumeric = true; sample = val; break; }
+            // Cek angka biasa atau pola 6.28E+10
+            if (/\d{5,}/.test(val) || /[0-9].*E\+/.test(val)) { 
+                isNumeric = true; 
+                sample = val; 
+                break; 
+            }
         }
-        const hasKeyword = keywords.some(k => col.toLowerCase().includes(k));
+        
         return { 
             name: col, 
             sample: sample, 
-            isVisible: hasKeyword || isNumeric, 
-            isRecommended: isNumeric 
+            // Kolom muncul jika punya keyword ATAU berisi angka
+            isVisible: isExplicitPhoneValue || hasKeyword || isNumeric, 
+            // Kolom tercentang otomatis jika mengandung 'Phone' & 'Value' ATAU terbukti ada angka
+            isRecommended: isExplicitPhoneValue || isNumeric
         };
     }).filter(item => item.isVisible);
 }
@@ -63,7 +83,7 @@ function detectPhoneColumns(data) {
 document.getElementById('upload-excel').addEventListener('change', function(e) {
     const file = e.target.files[0];
     if (!file) return;
-    toggleLoading(true, "Memindai Seluruh Baris...");
+    toggleLoading(true, "Ultra Deep Scan Active...");
     const reader = new FileReader();
     reader.onload = function(event) {
         try {
@@ -71,10 +91,10 @@ document.getElementById('upload-excel').addEventListener('change', function(e) {
             const workbook = XLSX.read(data, {type: 'array'});
             excelData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
             const detected = detectPhoneColumns(excelData);
-            document.getElementById('column-checkbox-list').innerHTML = '<h4>Deteksi Kolom:</h4>' + detected.map(item => `
+            document.getElementById('column-checkbox-list').innerHTML = '<h4>Kolom Terdeteksi (v3.6.3):</h4>' + detected.map(item => `
                 <div class="column-item">
                     <label><input type="checkbox" name="phone-cols" value="${item.name}" ${item.isRecommended ? 'checked' : ''}> 
-                    <strong>${item.name}</strong> <span class="sample-text">${item.sample ? 'Contoh: '+item.sample : '(Kosong)'}</span></label>
+                    <strong>${item.name}</strong> <span class="sample-text">${item.sample ? 'Sample: '+item.sample : '(Empty)'}</span></label>
                 </div>`).join('');
             document.getElementById('config-section').style.display = 'block';
             document.getElementById('file-name-display').innerText = file.name;
@@ -86,8 +106,8 @@ document.getElementById('upload-excel').addEventListener('change', function(e) {
 
 async function runProcess(isBlast) {
     const selectedCols = Array.from(document.querySelectorAll('input[name="phone-cols"]:checked')).map(el => el.value);
-    if (selectedCols.length === 0) return alert("Pilih kolom!");
-    toggleLoading(true, "Sedang Memproses...");
+    if (selectedCols.length === 0) return alert("Pilih kolom telepon!");
+    toggleLoading(true, "Processing Data...");
     setTimeout(() => {
         const results = [], globalSeen = new Set();
         excelData.forEach(row => {
@@ -111,7 +131,7 @@ async function runProcess(isBlast) {
         });
         const ws = XLSX.utils.json_to_sheet(results), wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "Result");
-        XLSX.writeFile(wb, isBlast ? "Data_Blast.xlsx" : "Arsip_Rapi.xlsx");
+        XLSX.writeFile(wb, isBlast ? "Data_Blast.xlsx" : "Arsip_Final.xlsx");
         toggleLoading(false);
     }, 200);
 }
