@@ -1,11 +1,12 @@
 /**
- * CONTACT CLEANER PRO V3.5 - HYBRID ENGINE
+ * CONTACT CLEANER PRO V3.6 - HYBRID ENGINE
+ * Update: Full Deep Scan for Multi-Column detection
  * Mode Arsip: Tidy Up (Keep Original Context + Audit Status)
  * Mode Blast: Clean Up (Force 62 + Strict Filtering)
  */
 
 const cleaner = {
-    // Menangani / , ::: , ; , dan spasi lebar
+    // Menangani pemisah / , ::: , ; , dan spasi lebar
     splitNumbers: function(rawString) {
         if (!rawString) return [];
         return String(rawString)
@@ -48,29 +49,42 @@ function toggleLoading(show, text = "") {
     overlay.style.display = show ? 'flex' : 'none';
 }
 
-// Deep Scan mencari kolom telepon di ribuan baris
+// FULL SCAN: Mencari kolom telepon di seluruh baris tanpa batasan
 function detectPhoneColumns(data) {
     const allColumns = Object.keys(data[0]);
     const phoneKeywords = ['phone', 'mobile', 'kontak', 'contact', 'telp', 'wa', 'value', 'msisdn'];
+    
     return allColumns.map(col => {
+        const colLower = col.toLowerCase();
+        const hasKeyword = phoneKeywords.some(k => colLower.includes(k));
+        
         let isNumeric = false;
         let sample = "";
-        for (let i = 0; i < Math.min(data.length, 2000); i++) { // Deep Scan up to 2000 rows
-            const val = String(data[i][col] || "");
-            if (/\d{5,}/.test(val)) { isNumeric = true; sample = val; break; }
+        
+        // Pindai semua baris untuk memastikan kolom seperti Phone 5 terdeteksi
+        for (let i = 0; i < data.length; i++) { 
+            const val = String(data[i][col] || "").trim();
+            if (/\d{5,}/.test(val)) { 
+                isNumeric = true; 
+                sample = val; 
+                break; 
+            }
         }
+        
         return { 
             name: col, 
             sample: sample, 
-            isRecommended: isNumeric || phoneKeywords.some(k => col.toLowerCase().includes(k)) 
+            // Otomatis centang jika ada isinya, tampilkan jika ada keyword
+            isVisible: hasKeyword || isNumeric,
+            isRecommended: isNumeric 
         };
-    });
+    }).filter(item => item.isVisible);
 }
 
 document.getElementById('upload-excel').addEventListener('change', function(e) {
     const file = e.target.files[0];
     if (!file) return;
-    toggleLoading(true, "Membaca & Memindai Data...");
+    toggleLoading(true, "Membaca & Memindai Seluruh Data...");
     
     const reader = new FileReader();
     reader.onload = function(event) {
@@ -83,7 +97,7 @@ document.getElementById('upload-excel').addEventListener('change', function(e) {
             document.getElementById('column-checkbox-list').innerHTML = '<h4>Deteksi Kolom Telepon:</h4>' + detected.map(item => `
                 <div class="column-item">
                     <label><input type="checkbox" name="phone-cols" value="${item.name}" ${item.isRecommended ? 'checked' : ''}> 
-                    <strong>${item.name}</strong> <span class="sample-text">${item.sample ? 'Contoh: '+item.sample : ''}</span></label>
+                    <strong>${item.name}</strong> <span class="sample-text">${item.sample ? 'Contoh: '+item.sample : '(Kosong)'}</span></label>
                 </div>
             `).join('');
             
@@ -108,8 +122,9 @@ async function runProcess(isBlastMode) {
 
         excelData.forEach(row => {
             const baseRow = { ...row };
+            
+            // Gabungkan Nama jika opsi dipilih & kolom tersedia
             if (doCombineNames) {
-                // Menggabungkan Nama Lengkap jika kolom tersedia
                 baseRow['Full_Name_Combined'] = [row['First Name'], row['Middle Name'], row['Last Name']].filter(Boolean).join(' ');
             }
 
@@ -124,21 +139,19 @@ async function runProcess(isBlastMode) {
             collectedNums.forEach(num => {
                 let info;
                 if (isBlastMode) {
-                    // LOGIKA BLAST: Paksa 62, Buang sampah, Cek Duplikat
                     info = cleaner.formatForBlast(num);
-                    if (!info.isValid) return; // Buang nomor pendek/invalid
+                    if (!info.isValid) return; 
                     if (skipHome && info.type === 'Home') return;
                     if (document.getElementById('remove-dup').checked && globalSeen.has(info.formatted)) return;
                     globalSeen.add(info.formatted);
                 } else {
-                    // LOGIKA ARSIP: Merapikan simbol, simpan semua (termasuk yang pendek)
                     const tidy = cleaner.formatForArchive(num);
                     info = { formatted: tidy.formatted, type: tidy.type };
-                    // Di mode Arsip kita tidak menghapus duplikat global agar data kontak tetap utuh
                 }
 
                 const finalRow = { ...baseRow };
-                selectedCols.forEach(c => delete finalRow[c]); // Hapus kolom asli agar rapi
+                // Hapus kolom-kolom phone asli agar satu baris hanya satu nomor (Clean_Phone)
+                selectedCols.forEach(c => delete finalRow[c]);
                 
                 finalRow['Clean_Phone'] = info.formatted;
                 finalRow[isBlastMode ? 'Phone_Type' : 'Status_Kualitas'] = info.type;
