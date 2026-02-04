@@ -3,38 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Cleaner Pro</title>
+    <title>Contact Cleaner Pro V3.0</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
 </head>
 <body>
+    <div id="loading-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.9); z-index:9999; flex-direction:column; justify-content:center; align-items:center;">
+        <div class="spinner"></div>
+        <p id="loading-text" style="color:#4f46e5; margin-top:15px; font-weight:bold; font-family: sans-serif;">Sedang Memproses...</p>
+    </div>
+
     <div class="container">
-        <h1>Contact Cleaner Pro</h1>
-        <p>IT Support Automation Tool</p>
+        <h1>Contact Cleaner Pro <span style="font-size: 0.5em; opacity: 0.7;">V3.0</span></h1>
+        <p>IT Support Automation: Deep Scan & Multi-Column Engine</p>
         
-        <div class="upload-section">
-            <input type="file" id="upload-excel" accept=".xlsx, .xls">
-            <p>Tarik file Excel ke sini atau klik untuk upload</p>
+        <div class="upload-section" onclick="document.getElementById('upload-excel').click()">
+            <input type="file" id="upload-excel" accept=".xlsx, .xls, .csv" style="display:none">
+            <p>Tarik file Excel/CSV ke sini atau klik untuk upload</p>
+            <span id="file-name-display" style="color: #4f46e5; font-weight: bold; display: block; margin-top: 10px;"></span>
         </div>
 
         <div id="config-section" style="display:none;">
-            <h3>Pengaturan Pembersihan</h3>
-            <label>Pilih Kolom Nomor Telepon:</label>
-            <select id="column-selector"></select>
+            <div id="column-checkbox-list" class="column-selection-area">
+                </div>
             
             <div class="options">
-                <label><input type="checkbox" id="clean-home" checked> Hapus No. Rumah</label>
-                <label><input type="checkbox" id="clean-intl" checked> Hapus No. Luar Negeri</label>
-                <label><input type="checkbox" id="remove-dup" checked> Hapus Duplikat</label>
+                <h3>Opsi Pembersihan</h3>
+                <label><input type="checkbox" id="clean-home" checked> Hapus No. Rumah (PSTN)</label>
+                <label><input type="checkbox" id="remove-dup" checked> Hapus Duplikat Nomor</label>
+                <label><input type="checkbox" id="combine-names" checked> Gabungkan Nama Lengkap (First + Middle + Last)</label>
             </div>
             
-            <button id="process-btn">Proses & Download</button>
+            <div class="button-group">
+                <button id="archive-btn" class="secondary">Mode Arsip (Rapi ke Samping)</button>
+                <button id="blast-btn">Mode Blast (Satu Nomor Per Baris)</button>
+            </div>
         </div>
 
         <div id="stats" class="stats-container"></div>
     </div>
 
-    <script src="js/cleaner.js"></script>
     <script src="js/app.js"></script>
 </body>
 </html>
