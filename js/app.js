@@ -3,7 +3,7 @@
  * v3.7.5 - Full Manual Selection Mode
  * Deskripsi: Awal upload tidak tercentang untuk mencegah file bengkak.
  */
-const APP_VERSION = "v3.7.6-ManualMode";
+const APP_VERSION = "v3.7.7-ManualMode";
 let excelData = [];
 
 // Inisialisasi Versi di Layar
