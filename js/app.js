@@ -2,12 +2,13 @@
  * CONTACT CLEANER PRO
  * v3.6.6 - Ultra Deep Scan & Multi-Select Action
  */
-const APP_VERSION = "v3.6.6-MultiSelect";
+const APP_VERSION = "v3.6.6-Final";
 
+// Inisialisasi Versi di Layar
 document.addEventListener("DOMContentLoaded", () => {
     const tag = document.getElementById('version-tag');
     if (tag) tag.innerText = APP_VERSION;
-    console.log(`%c ${APP_VERSION} Active: Ready for 1-Row 1-Phone Format `, "background: #6366f1; color: #fff; font-weight: bold; padding: 4px;");
+    console.log(`%c ${APP_VERSION} Active `, "background: #6366f1; color: #fff; font-weight: bold; padding: 4px;");
 });
 
 // Fungsi untuk tombol Select All
@@ -72,7 +73,7 @@ function processColumns(data) {
 document.getElementById('upload-excel').addEventListener('change', function(e) {
     const file = e.target.files[0];
     if (!file) return;
-    toggleLoading(true, "Menganalisis Kolom Database...");
+    toggleLoading(true, "Menganalisis Database...");
     const reader = new FileReader();
     reader.onload = function(event) {
         try {
@@ -102,9 +103,9 @@ document.getElementById('upload-excel').addEventListener('change', function(e) {
 async function runProcess(isBlast) {
     const selectedPhones = Array.from(document.querySelectorAll('input[name="phone-cols"]:checked')).map(el => el.value);
     const selectedMeta = Array.from(document.querySelectorAll('input[name="meta-cols"]:checked')).map(el => el.value);
-    if (selectedPhones.length === 0) return alert("Pilih kolom telepon!");
+    if (selectedPhones.length === 0) return alert("Pilih minimal satu kolom telepon!");
 
-    toggleLoading(true, "Sedang Normalisasi Data...");
+    toggleLoading(true, "Normalisasi Baris...");
     setTimeout(() => {
         const results = [], globalSeen = new Set();
         excelData.forEach(row => {
