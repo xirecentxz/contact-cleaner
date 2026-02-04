@@ -1,46 +1,37 @@
-let excelData = [];
-
-document.getElementById('upload-excel').addEventListener('change', function(e) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        const data = new Uint8Array(e.target.result);
-        const workbook = XLSX.read(data, {type: 'array'});
-        const firstSheet = workbook.SheetNames[0];
-        excelData = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheet]);
-
-        // Munculkan pilihan kolom
-        const selector = document.getElementById('column-selector');
-        selector.innerHTML = Object.keys(excelData[0]).map(col => `<option value="${col}">${col}</option>`).join('');
-        document.getElementById('config-section').style.display = 'block';
-    };
-    reader.readAsArrayBuffer(e.target.files[0]);
-});
-
 document.getElementById('process-btn').addEventListener('click', function() {
     const targetCol = document.getElementById('column-selector').value;
     const results = [];
     const seen = new Set();
 
     excelData.forEach(row => {
-        const info = cleaner.classify(row[targetCol]);
-        
-        // Filter Berdasarkan Checkbox
-        if (document.getElementById('clean-home').checked && info.type === 'Home') return;
-        if (document.getElementById('clean-intl').checked && info.type === 'International/Invalid') return;
-        
-        if (document.getElementById('remove-dup').checked) {
-            if (seen.has(info.formatted)) return;
-            seen.add(info.formatted);
-        }
+        const rawValue = row[targetCol];
+        const individualNumbers = cleaner.splitNumbers(rawValue);
 
-        // Update row dengan nomor yang sudah rapi
-        row[targetCol] = info.formatted;
-        results.push(row);
+        individualNumbers.forEach(num => {
+            const info = cleaner.classify(num);
+            
+            // Filter Berdasarkan Checkbox
+            if (document.getElementById('clean-home').checked && info.type === 'Home') return;
+            if (document.getElementById('clean-intl').checked && info.type === 'International/Invalid') return;
+            
+            // Dedup (Opsional berdasarkan nomor bersih)
+            if (document.getElementById('remove-dup').checked) {
+                if (seen.has(info.formatted)) return;
+                seen.add(info.formatted);
+            }
+
+            // CLONING DATA: Agar satu baris bisa jadi banyak baris
+            const newRow = { ...row }; 
+            newRow[targetCol] = info.formatted; // Timpa nomor lama dengan yang sudah bersih
+            newRow['Label_Type'] = info.type;   // Tambah kolom baru untuk menandai jenis nomor
+            
+            results.push(newRow);
+        });
     });
 
-    // Download Hasil
+    // Generate Excel baru
     const ws = XLSX.utils.json_to_sheet(results);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Clean Data");
-    XLSX.writeFile(wb, "Data_Bersih.xlsx");
+    XLSX.writeFile(wb, "Data_Kontak_Sempurna.xlsx");
 });
