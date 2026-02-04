@@ -3,23 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Cleaner Pro V3.6.6</title>
+    <title>Contact Cleaner Pro V3.7.3</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
 </head>
 <body>
     <div id="loading-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.9); z-index:9999; flex-direction:column; justify-content:center; align-items:center;">
         <div class="spinner"></div>
-        <p id="loading-text" style="color:#4f46e5; margin-top:15px; font-weight:bold; font-family: sans-serif;">Memproses Data...</p>
+        <p id="loading-text" style="color:#4f46e5; margin-top:15px; font-weight:bold; font-family: sans-serif;">Memproses...</p>
     </div>
 
     <div class="container">
         <h1>Contact Cleaner Pro <span id="version-tag" style="font-size: 0.4em; color: #64748b;">Loading...</span></h1>
-        <p>IT Support Automation: Deep Scan & Multi-Column Engine</p>
         
         <div class="upload-section" onclick="document.getElementById('upload-excel').click()">
             <input type="file" id="upload-excel" accept=".xlsx, .xls, .csv" style="display:none">
-            <p>Tarik file Excel/CSV ke sini atau klik untuk upload</p>
+            <p>Klik atau Tarik file CSV/Excel ke sini</p>
             <span id="file-name-display" style="color: #4f46e5; font-weight: bold; display: block; margin-top: 10px;"></span>
         </div>
 
@@ -30,7 +29,7 @@
             </div>
             <div id="column-checkbox-list" class="column-selection-area"></div>
             
-            <div id="metadata-section" style="margin-top:20px;">
+            <div id="metadata-section">
                 <div class="header-with-action">
                     <h4>Simpan Kolom Metadata:</h4>
                     <button type="button" class="link-btn" onclick="toggleAll('meta-cols')">Select All</button>
@@ -39,19 +38,21 @@
             </div>
 
             <div class="options">
-                <h3>Opsi Pembersihan</h3>
-                <label><input type="checkbox" id="clean-home" checked> Hapus No. Rumah (PSTN)</label>
-                <label><input type="checkbox" id="remove-dup" checked> Hapus Duplikat Nomor</label>
+                <label><input type="checkbox" id="clean-home" checked> Hapus No. Rumah (PSTN) - Khusus Blast</label>
+                <label><input type="checkbox" id="remove-dup" checked> Hapus Duplikat Nomor - Khusus Blast</label>
                 <label><input type="checkbox" id="combine-names" checked> Gabungkan Nama Lengkap</label>
             </div>
             
             <div class="button-group">
-                <button id="archive-btn" class="secondary">Mode Arsip</button>
-                <button id="blast-btn">Mode Blast</button>
+                <button id="archive-btn" class="secondary">Mode Arsip (Ke Samping)</button>
+                <button id="blast-btn">Mode Blast (Ke Bawah)</button>
             </div>
         </div>
     </div>
 
+    <script src="js/cleaner-blast.js"></script>
+    <script src="js/cleaner-archive.js"></script>
+    <script src="js/excel-handler.js"></script>
     <script>
         document.write('<script src="js/app.js?v=' + Date.now() + '"><\/script>');
     </script>
