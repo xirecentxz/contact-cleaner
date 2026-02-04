@@ -17,7 +17,7 @@ body {
 }
 
 .container {
-    max-width: 600px;
+    max-width: 650px;
     width: 100%;
     background: var(--card);
     padding: 30px;
@@ -26,77 +26,66 @@ body {
     border: 1px solid var(--border);
 }
 
-h1 {
-    margin: 0;
-    font-size: 24px;
-    color: var(--primary);
-}
-
-p {
-    color: #94a3b8;
-    font-size: 14px;
-}
-
 .upload-section {
     border: 2px dashed var(--primary);
     padding: 40px 20px;
     text-align: center;
     border-radius: 8px;
     margin: 25px 0;
-    transition: background 0.3s;
     cursor: pointer;
+    transition: 0.3s;
 }
 
-.upload-section:hover {
-    background: rgba(79, 70, 229, 0.1);
-}
+.upload-section:hover { background: rgba(79, 70, 229, 0.1); }
 
-#config-section {
+.column-selection-area {
     background: #111827;
-    padding: 20px;
+    padding: 15px;
     border-radius: 8px;
-    margin-top: 20px;
+    margin-bottom: 20px;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid var(--border);
 }
 
-select, button {
-    width: 100%;
-    padding: 12px;
-    margin: 10px 0;
-    border-radius: 6px;
-    border: 1px solid var(--border);
-    background: #1e293b;
-    color: white;
+.column-item {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    border-bottom: 1px solid #2d3748;
+}
+
+.sample-text {
+    color: #64748b;
+    font-size: 11px;
+    margin-left: 10px;
+}
+
+.button-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
 }
 
 button {
+    padding: 12px;
+    border-radius: 6px;
+    border: none;
     background: var(--primary);
+    color: white;
     font-weight: bold;
     cursor: pointer;
-    border: none;
-    transition: opacity 0.2s;
 }
 
-button:hover {
-    opacity: 0.9;
+button.secondary { background: #475569; }
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #334155;
+    border-top: 5px solid var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
 }
 
-.options {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin: 15px 0;
-}
-
-.options label {
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-/* Statistik Style */
-.stats-container {
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 1px solid var(--border);
-}
+@keyframes spin { 100% { transform: rotate(360deg); } }
