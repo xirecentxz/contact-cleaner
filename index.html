@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Cleaner Pro V3.6.1</title>
-    <link rel="stylesheet" href="style.css?v=3.6.2">
+    <title>Contact Cleaner Pro</title>
+    <link rel="stylesheet" href="style.css">
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
 </head>
 <body>
@@ -14,7 +14,7 @@
     </div>
 
     <div class="container">
-        <h1>Contact Cleaner Pro <span id="version-tag" style="font-size: 0.4em; color: #64748b;">v3.6.1</span></h1>
+        <h1>Contact Cleaner Pro <span id="version-tag" style="font-size: 0.4em; color: #64748b;">Loading...</span></h1>
         <p>IT Support Automation: Deep Scan & Multi-Column Engine</p>
         
         <div class="upload-section" onclick="document.getElementById('upload-excel').click()">
@@ -30,16 +30,18 @@
                 <h3>Opsi Pembersihan</h3>
                 <label><input type="checkbox" id="clean-home" checked> Hapus No. Rumah (PSTN)</label>
                 <label><input type="checkbox" id="remove-dup" checked> Hapus Duplikat Nomor</label>
-                <label><input type="checkbox" id="combine-names" checked> Gabungkan Nama Lengkap (First+Middle+Last)</label>
+                <label><input type="checkbox" id="combine-names" checked> Gabungkan Nama Lengkap</label>
             </div>
             
             <div class="button-group">
-                <button id="archive-btn" class="secondary">Mode Arsip (Rapi 1 Baris 1 No)</button>
-                <button id="blast-btn">Mode Blast (Siap Kirim Meta)</button>
+                <button id="archive-btn" class="secondary">Mode Arsip</button>
+                <button id="blast-btn">Mode Blast</button>
             </div>
         </div>
     </div>
 
-    <script src="js/app.js?v=3.6.1"></script>
+    <script>
+        document.write('<script src="js/app.js?v=' + Date.now() + '"><\/script>');
+    </script>
 </body>
 </html>
