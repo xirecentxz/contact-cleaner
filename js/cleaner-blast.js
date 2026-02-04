@@ -1,7 +1,7 @@
 const blastCleaner = {
     format: function(phone) {
-        // Hapus semua selain angka
-        let clean = String(phone).replace(/[^\d]/g, '');
+        // Ambil angka saja
+        let clean = String(phone).replace(/\D/g, '');
         
         // Normalisasi 08 atau 8 menjadi 628
         if (clean.startsWith('08')) clean = '62' + clean.slice(1);
