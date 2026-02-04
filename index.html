@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Cleaner Pro</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Contact Cleaner Pro V3.6.6</title>
+    <link rel="stylesheet" href="style.css?v=3.6.6">
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
 </head>
 <body>
     <div id="loading-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.9); z-index:9999; flex-direction:column; justify-content:center; align-items:center;">
         <div class="spinner"></div>
-        <p id="loading-text" style="color:#4f46e5; margin-top:15px; font-weight:bold; font-family: sans-serif;">Sedang Memproses...</p>
+        <p id="loading-text" style="color:#4f46e5; margin-top:15px; font-weight:bold; font-family: sans-serif;">Memproses Data...</p>
     </div>
 
     <div class="container">
@@ -24,8 +24,20 @@
         </div>
 
         <div id="config-section" style="display:none;">
+            <div class="header-with-action">
+                <h4>Pilih Kolom Telepon:</h4>
+                <button type="button" class="link-btn" onclick="toggleAll('phone-cols')">Select All</button>
+            </div>
             <div id="column-checkbox-list" class="column-selection-area"></div>
             
+            <div id="metadata-section" style="margin-top:20px;">
+                <div class="header-with-action">
+                    <h4>Simpan Kolom Metadata:</h4>
+                    <button type="button" class="link-btn" onclick="toggleAll('meta-cols')">Select All</button>
+                </div>
+                <div id="metadata-checkbox-list" class="column-selection-area" style="max-height: 150px;"></div>
+            </div>
+
             <div class="options">
                 <h3>Opsi Pembersihan</h3>
                 <label><input type="checkbox" id="clean-home" checked> Hapus No. Rumah (PSTN)</label>
@@ -45,7 +57,3 @@
     </script>
 </body>
 </html>
-
-<script>
-    document.write('<script src="js/app.js?v=' + Date.now() + '"><\/script>');
-</script>
