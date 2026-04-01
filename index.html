@@ -3,35 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Cleaner Pro</title>
+    <title>Contact Cleaner Pro v4.0</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap">
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
 </head>
 <body>
-    <div id="loading-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.9); z-index:9999; flex-direction:column; justify-content:center; align-items:center;">
+    <div id="loading-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999; flex-direction:column; justify-content:center; align-items:center; backdrop-filter: blur(10px);">
         <div class="spinner"></div>
-        <p id="loading-text" style="color:#4f46e5; margin-top:15px; font-weight:bold; font-family: sans-serif;">Memproses...</p>
+        <p id="loading-text" style="color:#6366f1; margin-top:20px; font-weight:600; letter-spacing: 1px;">MEMPROSES DATA...</p>
+        <div style="width: 200px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 10px; margin-top: 10px; overflow: hidden;">
+            <div id="progress-bar-fill" style="width: 0%; height: 100%; background: #6366f1; transition: width 0.3s;"></div>
+        </div>
     </div>
 
     <div class="container">
-        <h1>Contact Cleaner Pro <span id="version-tag" style="font-size: 0.4em; color: #64748b;">Loading...</span></h1>
+        <h1>Contact Cleaner Pro <span id="version-tag" style="font-size: 0.4em; color: #94a3b8; vertical-align: middle; margin-left: 10px;">v4.0.0</span></h1>
         
         <div class="upload-section" onclick="document.getElementById('upload-excel').click()">
             <input type="file" id="upload-excel" accept=".xlsx, .xls, .csv" style="display:none">
-            <p>Klik atau Tarik file CSV/Excel ke sini</p>
-            <span id="file-name-display" style="color: #4f46e5; font-weight: bold; display: block; margin-top: 10px;"></span>
+            <p style="font-weight: 600; opacity: 0.9;">Klik atau Tarik file CSV/Excel ke sini</p>
+            <span id="file-name-display" style="color: #6366f1; font-size: 0.9rem; font-weight: bold; display: block; margin-top: 15px;"></span>
         </div>
 
         <div id="config-section" style="display:none;">
             <div class="header-with-action">
-                <h4>Pilih Kolom Telepon:</h4>
+                <h4 style="color: #94a3b8;">Pilih Kolom Telepon:</h4>
                 <button type="button" class="link-btn" onclick="toggleAll('phone-cols')">Select All</button>
             </div>
             <div id="column-checkbox-list" class="column-selection-area"></div>
             
             <div id="metadata-section">
                 <div class="header-with-action">
-                    <h4>Simpan Kolom Metadata:</h4>
+                    <h4 style="color: #94a3b8;">Simpan Kolom Metadata:</h4>
                     <button type="button" class="link-btn" onclick="toggleAll('meta-cols')">Select All</button>
                 </div>
                 <div id="metadata-checkbox-list" class="column-selection-area" style="max-height: 150px;"></div>
@@ -47,6 +51,21 @@
                 <button id="archive-btn" class="secondary">Mode Arsip (Ke Samping)</button>
                 <button id="blast-btn">Mode Blast (Ke Bawah)</button>
             </div>
+
+            <div id="stats-report" style="display:none; margin-top: 25px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="color: #10b981; font-weight: 600;">✅ Berhasil: <span id="count-success">0</span></span>
+                    <span style="color: #ef4444; font-weight: 600;">❌ Dibuang: <span id="count-failed">0</span></span>
+                </div>
+            </div>
+
+            <div id="preview-area" style="display:none; margin-top: 25px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+                <h4 style="color: #6366f1; margin-bottom: 15px;">Preview (5 Baris Pertama):</h4>
+                <div style="overflow-x: auto; background: rgba(0,0,0,0.3); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                    <table id="preview-table" style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                        </table>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -54,6 +73,7 @@
     <script src="js/cleaner-archive.js"></script>
     <script src="js/excel-handler.js"></script>
     <script>
+        // Anti-cache untuk app.js selama development
         document.write('<script src="js/app.js?v=' + Date.now() + '"><\/script>');
     </script>
 </body>
