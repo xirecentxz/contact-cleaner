@@ -1,7 +1,6 @@
 /**
  * CONTACT CLEANER PRO
- * v3.7.5 - Full Manual Selection Mode
- * Deskripsi: Awal upload tidak tercentang untuk mencegah file bengkak.
+ * v3.7.8 - Fixed ID Selection & Smart Header Detection
  */
 const APP_VERSION = "v3.7.8";
 let excelData = [];
@@ -35,27 +34,44 @@ document.getElementById('upload-excel').addEventListener('change', function(e) {
     });
 });
 
-// Fungsi untuk merender daftar kolom (Awalnya tidak tercentang)
+// Fungsi untuk merender daftar kolom
 function renderConfig(data) {
     if (!data || data.length === 0) return;
-    const cols = Object.keys(data[0]);
-    const phoneKeywords = ['phone', 'mobile', 'value', 'wa', 'telp', 'kontak'];
+
+    // Ambil semua judul kolom dari baris pertama yang berisi data
+    const firstRow = data.find(row => Object.keys(row).length > 0) || data[0];
+    const cols = Object.keys(firstRow);
     
-    // Render Kolom Telepon - DISET TIDAK TERCENTANG
-    document.getElementById('column-checkbox-list').innerHTML = cols
-        .filter(c => phoneKeywords.some(k => c.toLowerCase().includes(k)))
-        .map(c => `
+    // Kata kunci untuk mendeteksi kolom yang kemungkinan berisi nomor telepon
+    const phoneKeywords = ['phone', 'mobile', 'value', 'wa', 'telp', 'kontak', 'contact', 'no', 'hp'];
+    
+    // Sinkronisasi ID dengan index.html Anda
+    const phoneContainer = document.getElementById('column-checkbox-list');
+    const metaContainer = document.getElementById('metadata-checkbox-list');
+
+    // Filter Kolom Telepon
+    const phoneCols = cols.filter(c => phoneKeywords.some(k => c.toLowerCase().includes(k)));
+    
+    phoneContainer.innerHTML = phoneCols.map(c => `
             <div class="column-item">
                 <label><input type="checkbox" name="phone-cols" value="${c}"> <strong>${c}</strong></label>
             </div>`).join('');
     
-    // Render Kolom Metadata - DISET TIDAK TERCENTANG
-    document.getElementById('metadata-checkbox-list').innerHTML = cols
-        .filter(c => !phoneKeywords.some(k => c.toLowerCase().includes(k)))
+    // Filter Kolom Metadata (selain kolom telepon)
+    metaContainer.innerHTML = cols
+        .filter(c => !phoneCols.includes(c))
         .map(c => `
             <div class="column-item">
                 <label><input type="checkbox" name="meta-cols" value="${c}"> ${c}</label>
             </div>`).join('');
+    
+    // Jika tidak ada kolom yang cocok dengan kata kunci telepon, tampilkan semua di box telepon agar user bisa pilih manual
+    if (phoneCols.length === 0) {
+        phoneContainer.innerHTML = cols.map(c => `
+            <div class="column-item">
+                <label><input type="checkbox" name="phone-cols" value="${c}"> <strong>${c}</strong></label>
+            </div>`).join('');
+    }
     
     document.getElementById('config-section').style.display = 'block';
 }
@@ -66,7 +82,7 @@ async function runProcess(isBlast) {
     const selectedMeta = Array.from(document.querySelectorAll('input[name="meta-cols"]:checked')).map(el => el.value);
     
     if (selectedPhones.length === 0) {
-        return alert("Pilih minimal satu kolom telepon!");
+        return alert("Pilih minimal satu kolom yang berisi nomor telepon!");
     }
 
     document.getElementById('loading-overlay').style.display = 'flex';
@@ -77,18 +93,26 @@ async function runProcess(isBlast) {
         const combine = document.getElementById('combine-names').checked;
 
         excelData.forEach(row => {
-            // Split nomor menggunakan logika dari archive cleaner
             let nums = [];
             selectedPhones.forEach(col => { 
-                if (row[col]) nums = nums.concat(archiveCleaner.splitNumbers(row[col])); 
+                if (row[col]) {
+                    // Pastikan memanggil fungsi split dari archiveCleaner
+                    nums = nums.concat(archiveCleaner.splitNumbers(row[col])); 
+                }
             });
-            nums = [...new Set(nums)]; // Hapus duplikat dalam satu baris
+            
+            // Hapus duplikat dalam satu baris & bersihkan spasi
+            nums = [...new Set(nums.map(n => String(n).trim()))]; 
 
             if (isBlast) {
-                // MODE BLAST: Vertikal (Ke Bawah) & Ketat 628
+                // MODE BLAST: Vertikal (Ke Bawah) & Format 628
                 nums.forEach(n => {
                     const info = blastCleaner.format(n);
                     if (!info.isValid) return;
+                    
+                    // Filter No Rumah (PSTN) jika dicentang
+                    if (document.getElementById('clean-home').checked && info.formatted.startsWith('622')) return;
+                    
                     if (document.getElementById('remove-dup').checked && globalSeen.has(info.formatted)) return;
                     
                     globalSeen.add(info.formatted);
@@ -102,7 +126,7 @@ async function runProcess(isBlast) {
                     results.push(newRow);
                 });
             } else {
-                // MODE ARSIP: Horizontal (Ke Samping) & Pertahankan Data
+                // MODE ARSIP: Horizontal (Ke Samping)
                 const newRow = {};
                 if (combine) {
                     newRow['Full_Name_Combined'] = [row['First Name'], row['Middle Name'], row['Last Name']].filter(Boolean).join(' ');
@@ -114,11 +138,20 @@ async function runProcess(isBlast) {
                     const colLabel = i === 0 ? "Phone_Main" : `Phone_Ext_${i}`;
                     newRow[colLabel] = info.formatted;
                 });
-                results.push(newRow);
+                
+                if (Object.keys(newRow).length > selectedMeta.length + (combine ? 1 : 0)) {
+                    results.push(newRow);
+                }
             }
         });
 
-        const fileName = isBlast ? "Blast_Vertical.xlsx" : "Arsip_Horizontal.xlsx";
+        if (results.length === 0) {
+            alert("Tidak ada data yang berhasil diproses. Cek kembali pilihan kolom Anda.");
+            document.getElementById('loading-overlay').style.display = 'none';
+            return;
+        }
+
+        const fileName = isBlast ? "Blast_Mode_Result.xlsx" : "Archive_Mode_Result.xlsx";
         excelHandler.export(results, fileName);
         document.getElementById('loading-overlay').style.display = 'none';
     }, 100);
