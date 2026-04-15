@@ -4,76 +4,190 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact Cleaner Pro v4.0</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap">
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
 </head>
 <body>
-    <div id="loading-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999; flex-direction:column; justify-content:center; align-items:center; backdrop-filter: blur(10px);">
-        <div class="spinner"></div>
-        <p id="loading-text" style="color:#6366f1; margin-top:20px; font-weight:600; letter-spacing: 1px;">MEMPROSES DATA...</p>
-        <div style="width: 200px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 10px; margin-top: 10px; overflow: hidden;">
-            <div id="progress-bar-fill" style="width: 0%; height: 100%; background: #6366f1; transition: width 0.3s;"></div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay">
+        <div class="loading-inner">
+            <div class="spinner-ring">
+                <svg viewBox="0 0 50 50"><circle cx="25" cy="25" r="20" fill="none" stroke-width="3"/></svg>
+            </div>
+            <p id="loading-text">MEMPROSES DATA...</p>
+            <div class="progress-track">
+                <div id="progress-bar-fill"></div>
+            </div>
         </div>
     </div>
 
+    <!-- Background Orbs -->
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+    <div class="bg-orb orb-3"></div>
+
     <div class="container">
-        <h1>Contact Cleaner Pro <span id="version-tag" style="font-size: 0.4em; color: #94a3b8; vertical-align: middle; margin-left: 10px;">v4.0.0</span></h1>
-        
-        <div class="upload-section" onclick="document.getElementById('upload-excel').click()">
+
+        <!-- Header -->
+        <header class="app-header">
+            <div class="logo-mark">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 2L2 7l10 5 10-5-10-5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                    <path d="M2 17l10 5 10-5" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                    <path d="M2 12l10 5 10-5" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <div>
+                <h1>Contact Cleaner <span class="highlight">Pro</span></h1>
+                <span class="version-badge">v4.0.0</span>
+            </div>
+        </header>
+
+        <!-- Privacy Trust Banner -->
+        <div class="trust-banner">
+            <div class="trust-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 2L4 6v6c0 5.5 3.5 10.7 8 12 4.5-1.3 8-6.5 8-12V6l-8-4z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                    <path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <div class="trust-text">
+                <strong>100% Privat &amp; Aman</strong>
+                <span>Data kontak Anda diproses langsung di browser — tidak ada yang dikirim ke server manapun, tidak ada database, tidak ada penyimpanan. File Anda tetap milik Anda.</span>
+            </div>
+        </div>
+
+        <!-- Upload Section -->
+        <div class="upload-zone" id="upload-zone" onclick="document.getElementById('upload-excel').click()">
             <input type="file" id="upload-excel" accept=".xlsx, .xls, .csv" style="display:none">
-            <p style="font-weight: 600; opacity: 0.9;">Klik atau Tarik file CSV/Excel ke sini</p>
-            <span id="file-name-display" style="color: #6366f1; font-size: 0.9rem; font-weight: bold; display: block; margin-top: 15px;"></span>
+            <div class="upload-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    <polyline points="17 8 12 3 7 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <line x1="12" y1="3" x2="12" y2="15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <p class="upload-title">Unggah File Kontak</p>
+            <p class="upload-sub">Klik atau tarik file <strong>CSV / XLSX / XLS</strong> ke sini</p>
+            <span id="file-name-display" class="file-badge" style="display:none"></span>
         </div>
 
+        <!-- Config Section -->
         <div id="config-section" style="display:none;">
-            <div class="header-with-action">
-                <h4 style="color: #94a3b8;">Pilih Kolom Telepon:</h4>
-                <button type="button" class="link-btn" onclick="toggleAll('phone-cols')">Select All</button>
-            </div>
-            <div id="column-checkbox-list" class="column-selection-area"></div>
-            
-            <div id="metadata-section">
-                <div class="header-with-action">
-                    <h4 style="color: #94a3b8;">Simpan Kolom Metadata:</h4>
-                    <button type="button" class="link-btn" onclick="toggleAll('meta-cols')">Select All</button>
+
+            <!-- Phone Columns -->
+            <div class="section-block">
+                <div class="section-header">
+                    <div class="section-title">
+                        <div class="section-dot dot-purple"></div>
+                        Kolom Nomor Telepon
+                    </div>
+                    <button type="button" class="link-btn" onclick="toggleAll('phone-cols')">Pilih Semua</button>
                 </div>
-                <div id="metadata-checkbox-list" class="column-selection-area" style="max-height: 150px;"></div>
+                <div id="column-checkbox-list" class="column-selection-area"></div>
             </div>
 
-            <div class="options">
-                <label><input type="checkbox" id="clean-home" checked> Hapus No. Rumah (PSTN) - Khusus Blast</label>
-                <label><input type="checkbox" id="remove-dup" checked> Hapus Duplikat Nomor - Khusus Blast</label>
-                <label><input type="checkbox" id="combine-names" checked> Gabungkan Nama Lengkap</label>
-            </div>
-            
-            <div class="button-group">
-                <button id="archive-btn" class="secondary">Mode Arsip (Ke Samping)</button>
-                <button id="blast-btn">Mode Blast (Ke Bawah)</button>
+            <!-- Metadata Columns -->
+            <div class="section-block" id="metadata-section">
+                <div class="section-header">
+                    <div class="section-title">
+                        <div class="section-dot dot-teal"></div>
+                        Kolom Metadata
+                    </div>
+                    <button type="button" class="link-btn" onclick="toggleAll('meta-cols')">Pilih Semua</button>
+                </div>
+                <div id="metadata-checkbox-list" class="column-selection-area" style="max-height:150px;"></div>
             </div>
 
-            <div id="stats-report" style="display:none; margin-top: 25px;">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span style="color: #10b981; font-weight: 600;">✅ Berhasil: <span id="count-success">0</span></span>
-                    <span style="color: #ef4444; font-weight: 600;">❌ Dibuang: <span id="count-failed">0</span></span>
+            <!-- Options -->
+            <div class="section-block">
+                <div class="section-header" style="margin-bottom:14px;">
+                    <div class="section-title">
+                        <div class="section-dot dot-amber"></div>
+                        Opsi Pembersihan
+                    </div>
+                </div>
+                <div class="options-grid">
+                    <label class="option-card">
+                        <input type="checkbox" id="clean-home" checked>
+                        <div class="option-content">
+                            <span class="option-label">Hapus No. Rumah (PSTN)</span>
+                            <span class="option-desc">Khusus mode Blast</span>
+                        </div>
+                    </label>
+                    <label class="option-card">
+                        <input type="checkbox" id="remove-dup" checked>
+                        <div class="option-content">
+                            <span class="option-label">Hapus Duplikat Nomor</span>
+                            <span class="option-desc">Khusus mode Blast</span>
+                        </div>
+                    </label>
+                    <label class="option-card">
+                        <input type="checkbox" id="combine-names" checked>
+                        <div class="option-content">
+                            <span class="option-label">Gabungkan Nama Lengkap</span>
+                            <span class="option-desc">Semua mode</span>
+                        </div>
+                    </label>
                 </div>
             </div>
 
-            <div id="preview-area" style="display:none; margin-top: 25px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
-                <h4 style="color: #6366f1; margin-bottom: 15px;">Preview (5 Baris Pertama):</h4>
-                <div style="overflow-x: auto; background: rgba(0,0,0,0.3); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
-                    <table id="preview-table" style="width: 100%; border-collapse: collapse; font-size: 12px;">
-                        </table>
+            <!-- Action Buttons -->
+            <div class="action-grid">
+                <button id="archive-btn" class="btn-secondary">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="2" y="3" width="20" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/><path d="M4 8v11a2 2 0 002 2h12a2 2 0 002-2V8" stroke="currentColor" stroke-width="1.5"/><path d="M10 12h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                    Mode Arsip
+                    <span class="btn-sub">Ke Samping</span>
+                </button>
+                <button id="blast-btn" class="btn-primary">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M22 2L11 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M22 2L15 22l-4-9-9-4 20-7z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+                    Mode Blast
+                    <span class="btn-sub">Ke Bawah</span>
+                </button>
+            </div>
+
+            <!-- Stats -->
+            <div id="stats-report" style="display:none;">
+                <div class="stat-pill success">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Berhasil: <strong id="count-success">0</strong>
+                </div>
+                <div class="stat-pill danger">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                    Dibuang: <strong id="count-failed">0</strong>
                 </div>
             </div>
+
+            <!-- Preview -->
+            <div id="preview-area" style="display:none;">
+                <div class="preview-header">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5"/></svg>
+                    Preview — 5 Baris Pertama
+                </div>
+                <div class="preview-scroll">
+                    <table id="preview-table"></table>
+                </div>
+            </div>
+
         </div>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <div class="footer-privacy">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M12 2L4 6v6c0 5.5 3.5 10.7 8 12 4.5-1.3 8-6.5 8-12V6l-8-4z" stroke="currentColor" stroke-width="1.5"/></svg>
+                Tidak ada data yang meninggalkan perangkat Anda
+            </div>
+        </footer>
+
     </div>
 
     <script src="js/cleaner-blast.js"></script>
     <script src="js/cleaner-archive.js"></script>
     <script src="js/excel-handler.js"></script>
     <script>
-        // Anti-cache untuk app.js selama development
         document.write('<script src="js/app.js?v=' + Date.now() + '"><\/script>');
     </script>
 </body>
